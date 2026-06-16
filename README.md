@@ -1,14 +1,6 @@
-
----
-
-## 📄 محتوى main README
-
-```md
 # 🚀 Odoo SaaS Deployment Engine
 
 A full multi-tenant SaaS platform for deploying Odoo using Docker.
-
----
 
 # 📦 Versions
 
@@ -17,14 +9,10 @@ Simple deployment using manual reverse proxy.
 
 👉 `/v1-nginx`
 
----
-
 ## v2 - Traefik Based
 Advanced SaaS engine with automation and SSL.
 
 👉 `/v2-traefik`
-
----
 
 # 🧠 Features
 
