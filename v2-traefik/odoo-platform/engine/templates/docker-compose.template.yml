@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_${CLIENT_NAME}:/var/lib/postgresql/data
+    networks:
+      - odoo_net
+
+  odoo:
+    image: odoo:17
+    restart: always
+    depends_on:
+      - db
+    environment:
+      HOST: db
+      USER: ${ODOO_DB_USER}
+      PASSWORD: ${ODOO_DB_PASSWORD}
+
+    volumes:
+      - /opt/odoo-platform/shared-addons:/mnt/extra-addons
+      - /opt/odoo-platform/clients/${CLIENT_NAME}/overrides:/mnt/overrides
+      - odoo_${CLIENT_NAME}:/var/lib/odoo
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${CLIENT_NAME}.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${CLIENT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${CLIENT_NAME}.tls.certresolver=le"
+      - "traefik.http.services.${CLIENT_NAME}.loadbalancer.server.port=8069"
+
+    networks:
+      - odoo_net
+
+volumes:
+  db_${CLIENT_NAME}:
+  odoo_${CLIENT_NAME}:
+
+networks:
+  odoo_net:
+    external: true
