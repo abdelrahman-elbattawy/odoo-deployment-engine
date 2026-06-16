@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: StrongPass123
+    volumes:
+      - db_client1:/var/lib/postgresql/data
+    networks:
+      - odoo_net
+
+  odoo:
+    image: odoo:17
+    restart: always
+    depends_on:
+      - db
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: StrongPass123
+
+    volumes:
+      - /opt/odoo-platform/shared-addons:/mnt/extra-addons
+      - /opt/odoo-platform/clients/client1/overrides:/mnt/overrides
+      - odoo_client1:/var/lib/odoo
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client1.rule=Host(`client1.nezamx.org`)"
+      - "traefik.http.routers.client1.entrypoints=websecure"
+      - "traefik.http.routers.client1.tls.certresolver=le"
+      - "traefik.http.services.client1.loadbalancer.server.port=8069"
+
+    networks:
+      - odoo_net
+
+volumes:
+  db_client1:
+  odoo_client1:
+
+networks:
+  odoo_net:
+    external: true
